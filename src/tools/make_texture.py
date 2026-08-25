@@ -1,40 +1,45 @@
-from PIL import Image, ImageDraw
-import os
+from PIL import Image
 
-# 定义脚本所在目录的上一级（src/tools -> src）
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-# 构建目标文件完整路径
-OUTPUT_DIR = os.path.join(SCRIPT_DIR, '..', 'main', 'resources', 'assets', 'wooden_handle', 'textures', 'item')
-OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'wooden_handle.png')
+# 高对比度颜色设置（保留前次设置的硬边）
+WOOD_EDGE = (110, 70, 30, 255)      # 木柄边缘：深木色
+WOOD_CORE = (180, 120, 60, 255)     # 木柄核心：亮木色
+LEATHER_EDGE = (130, 60, 20, 255)   # 皮革边缘：深红棕
+LEATHER_CORE = (200, 100, 50, 255)  # 皮革核心：亮红棕
 
-# 自动创建目录（如果不存在）
-os.makedirs(OUTPUT_DIR, exist_ok=True)
-
-# 创建16x16透明画布
+# 创建 16x16 透明图片
 img = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
-draw = ImageDraw.Draw(img)
+pixels = img.load()
 
-# 定义颜色
-WOOD_DARK = (75, 55, 35, 255)      # 深棕色
-WOOD_MID  = (95, 70, 45, 255)      # 中棕色
-LEATHER   = (140, 100, 70, 255)    # 皮革色
-LEATHER_D = (110, 80, 55, 255)     # 皮革暗部
+# 尺寸参数
+start_x = 2
+end_x = 13
+leather_start_x = 11  # 80%处开始包皮革
 
-# 画斜着的木柄（从左下到右上）
-for i in range(4, 14):  # 从x=4到x=13
-    y = 14 - i + 2  # 计算对应的y
-    draw.point((i, y), fill=WOOD_MID)
-    draw.point((i+1, y), fill=WOOD_DARK)
+for x in range(16):
+    for y in range(16):
+        # 判断对角线位置（宽度3像素）
+        s = x + y
+        if start_x <= x <= end_x and 15 <= s <= 17:
+            
+            # 完美圆头逻辑：移除左下角最底部的两个点 (2,14) 和 (2,15)，只保留 (2,13)
+            if x == start_x and y >= 14:
+                continue
+            
+            # 判定皮革区域 (右上角)
+            if x >= leather_start_x:
+                if s == 15 or s == 17:
+                    color = LEATHER_EDGE
+                else:
+                    color = LEATHER_CORE
+            else:
+                # 木柄主体（高对比度硬边）
+                if s == 15 or s == 17:
+                    color = WOOD_EDGE
+                else:
+                    color = WOOD_CORE
 
-# 顶部皮革包裹（在右上端）
-for i in range(11, 14):
-    y = 14 - i + 2
-    draw.point((i, y), fill=LEATHER)
-    draw.point((i+1, y), fill=LEATHER_D)
+            pixels[x, y] = color
 
-# 底部尖端
-draw.point((4, 12), fill=WOOD_DARK)
-
-# 保存为PNG
-img.save(OUTPUT_FILE)
-print(f"纹理已生成：{OUTPUT_FILE}")
+# 保存文件
+img.save('wooden_handle.png')
+print("✅ 木柄纹理已修复：圆头完整，无冗余像素。")
