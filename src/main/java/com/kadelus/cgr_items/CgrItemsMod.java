@@ -4,6 +4,7 @@ import net.fabricmc.api.ModInitializer;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.kadelus.cgr_items.item.ModItems;
 
 public class CgrItemsMod implements ModInitializer {
     public static final String MOD_ID = "wooden_handle";
