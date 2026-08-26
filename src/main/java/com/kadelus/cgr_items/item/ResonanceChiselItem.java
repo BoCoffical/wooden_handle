@@ -1,6 +1,7 @@
 package com.kadelus.cgr_items.item;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -19,16 +20,14 @@ public class ResonanceChiselItem extends Item {
     // 攻击实体：消耗 1 点耐久
     @Override
     public boolean postHit(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-        stack.damage(1, attacker, (livingEntity) -> {
-        });
+        stack.damage(1, attacker, EquipmentSlot.MAINHAND);
         return true;
     }
 
     // 破坏方块：消耗 1 点耐久
     @Override
     public boolean postMine(ItemStack stack, World world, BlockState state, BlockPos pos, LivingEntity miner) {
-        stack.damage(1, miner, (livingEntity) -> {
-        });
+        stack.damage(1, miner, EquipmentSlot.MAINHAND);
         return true;
     }
 
@@ -37,8 +36,8 @@ public class ResonanceChiselItem extends Item {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack stack = user.getStackInHand(hand);
         if (!world.isClient) {
-            stack.damage(2, user, (livingEntity) -> {
-            });
+            EquipmentSlot slot = hand == Hand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
+            stack.damage(2, user, slot);
         }
         return TypedActionResult.success(stack, world.isClient());
     }
