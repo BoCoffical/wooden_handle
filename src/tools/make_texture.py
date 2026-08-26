@@ -1,45 +1,44 @@
 from PIL import Image
 
-# 高对比度颜色设置（保留前次设置的硬边）
-WOOD_EDGE = (110, 70, 30, 255)      # 木柄边缘：深木色
-WOOD_CORE = (180, 120, 60, 255)     # 木柄核心：亮木色
-LEATHER_EDGE = (130, 60, 20, 255)   # 皮革边缘：深红棕
-LEATHER_CORE = (200, 100, 50, 255)  # 皮革核心：亮红棕
+# 更沉稳的木色/皮革色（降低亮度，缩小色差）
+WOOD_EDGE = (100, 65, 35, 255)
+WOOD_CORE = (130, 90, 55, 255)
+LEATHER_EDGE = (120, 55, 30, 255)   # 皮革外层
+LEATHER_CORE = (150, 75, 45, 255)   # 皮革内层/高光
 
-# 创建 16x16 透明图片
 img = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
 pixels = img.load()
 
-# 尺寸参数
+# 缩短长度，从 x=2 到 x=13（比之前短一点，显得更粗）
 start_x = 2
 end_x = 13
-leather_start_x = 11  # 80%处开始包皮革
+leather_start_x = 11  # 皮革包裹区间
 
 for x in range(16):
     for y in range(16):
-        # 判断对角线位置（宽度3像素）
         s = x + y
-        if start_x <= x <= end_x and 15 <= s <= 17:
+        if start_x <= x <= end_x and 14 <= s <= 17: # 4像素宽
             
-            # 完美圆头逻辑：移除左下角最底部的两个点 (2,14) 和 (2,15)，只保留 (2,13)
+            # 圆头 (左下)
             if x == start_x and y >= 14:
                 continue
-            
-            # 判定皮革区域 (右上角)
+
+            # 尖头 (右上，皮革区)，强制填充为皮革内层，饱满不缺失
+            if x == end_x:
+                pixels[x, y] = LEATHER_CORE if (s == 15 or s == 16) else LEATHER_EDGE
+                continue
+
+            # 常规部分上色（细腻的硬边渐变）
             if x >= leather_start_x:
-                if s == 15 or s == 17:
-                    color = LEATHER_EDGE
+                if s == 14 or s == 17:
+                    pixels[x, y] = LEATHER_EDGE
                 else:
-                    color = LEATHER_CORE
+                    pixels[x, y] = LEATHER_CORE
             else:
-                # 木柄主体（高对比度硬边）
-                if s == 15 or s == 17:
-                    color = WOOD_EDGE
+                if s == 14 or s == 17:
+                    pixels[x, y] = WOOD_EDGE
                 else:
-                    color = WOOD_CORE
+                    pixels[x, y] = WOOD_CORE
 
-            pixels[x, y] = color
-
-# 保存文件
 img.save('wooden_handle.png')
-print("✅ 木柄纹理已修复：圆头完整，无冗余像素。")
+print("✅ 木柄已优化：色调更沉稳，皮革包裹更细腻。")
