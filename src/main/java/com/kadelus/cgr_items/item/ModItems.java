@@ -4,7 +4,7 @@ import com.kadelus.cgr_items.CgrItemsMod;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifiersComponent;
-import net.minecraft.entity.EquipmentSlot;  // 修改：添加正确的导入
+import net.minecraft.entity.attribute.AttributeModifierSlot; // 【注意：这里是 Yarn 的正确类名】
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.Item;
@@ -26,7 +26,7 @@ public class ModItems {
                         Identifier.of(CgrItemsMod.MOD_ID, "resonance_chisel_damage"),
                         3.0,
                         EntityAttributeModifier.Operation.ADD_VALUE),
-                    EquipmentSlot.MAINHAND)  // 修改：Yarn映射中直接使用 EquipmentSlot
+                    AttributeModifierSlot.MAINHAND) // 【注意：这里必须用 AttributeModifierSlot】
                 .build()));
 
     public static void registerItems() {
