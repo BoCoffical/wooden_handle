@@ -4,7 +4,7 @@ import com.kadelus.cgr_items.CgrItemsMod;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.AttributeModifiersComponent;
-import net.minecraft.entity.EquipmentSlot;  // 关键：Yarn 用的是这个！
+import net.minecraft.entity.attribute.AttributeModifierSlot; // 关键修正：用这个！
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.item.Item;
@@ -25,7 +25,7 @@ public class ModItems {
                         Identifier.of(CgrItemsMod.MOD_ID, "resonance_chisel_damage"),
                         3.0, // 基础攻击1 + 3 = 4伤害
                         EntityAttributeModifier.Operation.ADD_VALUE),
-                    EquipmentSlot.MAINHAND)  // 关键：Yarn 用的是 EquipmentSlot.MAINHAND
+                    AttributeModifierSlot.MAINHAND) // 关键修正：这里也改！
                 .build()));
 
     public static void registerItems() {
