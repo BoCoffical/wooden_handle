@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " I ",
+    " H ",
+    "   "
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "H": {
+      "item": "wooden_handle:wooden_handle"
+    }
+  },
+  "result": {
+    "id": "wooden_handle:resonance_chisel",
+    "count": 1
+  }
+}

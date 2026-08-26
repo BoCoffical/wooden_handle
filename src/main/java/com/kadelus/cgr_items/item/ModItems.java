@@ -20,23 +20,24 @@ public class ModItems {
     // 伤害：基础1点 + 修正3点 = 4点总伤害。
     // 攻速：0.33秒一次（约3次/秒）。
     // 原版空手攻速是4.0。3.0 - 4.0 = -1.0。
-    public static final Item RESONANCE_CHISEL = new Item(new Item.Settings()
-        .maxCount(1)
-        .component(DataComponentTypes.ATTRIBUTE_MODIFIERS,
-            AttributeModifiersComponent.builder()
-                .add(EntityAttributes.GENERIC_ATTACK_DAMAGE,
-                    new EntityAttributeModifier(
-                        Identifier.of(CgrItemsMod.MOD_ID, "resonance_chisel_damage"),
-                        3.0, 
-                        EntityAttributeModifier.Operation.ADD_VALUE),
-                    AttributeModifierSlot.MAINHAND) // 关键修正：使用 AttributeModifierSlot
-                .add(EntityAttributes.GENERIC_ATTACK_SPEED,
-                    new EntityAttributeModifier(
-                        Identifier.of(CgrItemsMod.MOD_ID, "resonance_chisel_speed"),
-                        -1.0, // 4.0 - 1.0 = 3.0 攻速
-                        EntityAttributeModifier.Operation.ADD_VALUE),
-                    AttributeModifierSlot.MAINHAND)
-                .build()));
+    public static final Item RESONANCE_CHISEL = new ResonanceChiselItem(new Item.Settings()
+    .maxCount(1)
+    .maxDamage(200) // 耐久设定为200
+    .component(DataComponentTypes.ATTRIBUTE_MODIFIERS,
+        AttributeModifiersComponent.builder()
+            .add(EntityAttributes.GENERIC_ATTACK_DAMAGE,
+                new EntityAttributeModifier(
+                    Identifier.of(CgrItemsMod.MOD_ID, "resonance_chisel_damage"),
+                    3.0,
+                    EntityAttributeModifier.Operation.ADD_VALUE),
+                AttributeModifierSlot.MAINHAND)
+            .add(EntityAttributes.GENERIC_ATTACK_SPEED,
+                new EntityAttributeModifier(
+                    Identifier.of(CgrItemsMod.MOD_ID, "resonance_chisel_speed"),
+                    -1.0, // 3次/秒的攻击
+                    EntityAttributeModifier.Operation.ADD_VALUE),
+                AttributeModifierSlot.MAINHAND)
+            .build()));
 
     public static void registerItems() {
         Registry.register(Registries.ITEM,
