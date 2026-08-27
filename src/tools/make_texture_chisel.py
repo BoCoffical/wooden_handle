@@ -1,54 +1,46 @@
 from PIL import Image
+import os
 
-# 提亮并减少色差，增加立体感
-WOOD_EDGE = (90, 55, 25, 255)
-WOOD_CORE = (160, 105, 60, 255)
-LEATHER_EDGE = (110, 50, 25, 255)
-LEATHER_CORE = (170, 85, 45, 255)
+# ---------- 自动定位纹理路径 ----------
+def find_texture(filename):
+    cur = os.path.dirname(os.path.abspath(__file__))
+    for _ in range(10):
+        path = os.path.join(cur, "src", "main", "resources", "assets", "wooden_handle", "textures", "item", filename)
+        if os.path.exists(path):
+            return path
+        cur = os.path.dirname(cur)
+    return os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "main", "resources", "assets", "wooden_handle", "textures", "item", filename)
 
-# 铁质改为明亮偏白的钢灰色（完美匹配原版铁剑的质感）
-IRON_EDGE = (80, 85, 95, 255)       # 边缘阴影
-IRON_MID = (150, 155, 165, 255)     # 主体钢色
-IRON_HIGHLIGHT = (215, 220, 230, 255) # 高光
+INPUT = find_texture("resonance_chisel.png")
+OUTPUT = os.path.join(os.path.dirname(INPUT), "resonance_chisel_optimized.png")
 
-img = Image.new('RGBA', (16, 16), (0, 0, 0, 0))
-pixels = img.load()
+# ---------- 亮度调整函数 ----------
+def adjust_brightness(pixel):
+    r, g, b, a = pixel
+    # 仅处理灰色/铁质像素（R≈G≈B）
+    if abs(r - g) < 15 and abs(g - b) < 15:
+        # 亮度 = 通道平均值
+        lum = (r + g + b) // 3
+        # 分段映射：
+        # 0~50 映射到 60~90  (暗部提亮)
+        # 50~120 映射到 90~190 (中间调大幅提亮)
+        # 120~255 映射到 190~255 (高光微调，保持明亮)
+        if lum < 50:
+            new_lum = int(60 + (lum / 50) * 30)     # 60~90
+        elif lum < 120:
+            new_lum = int(90 + ((lum - 50) / 70) * 100)  # 90~190
+        else:
+            new_lum = int(190 + ((lum - 120) / 135) * 65) # 190~255
+        # 确保新亮度不超过255
+        new_lum = min(255, max(0, new_lum))
+        return (new_lum, new_lum, new_lum, a)
+    return pixel
 
-for x in range(16):
-    for y in range(16):
-        s = x + y
-
-        # 1. 短木柄 (x=2 到 x=7)
-        if 2 <= x <= 7 and 14 <= s <= 17:
-            if x == 2 and y >= 14: continue
-            if s == 14 or s == 17:
-                pixels[x, y] = WOOD_EDGE
-            else:
-                pixels[x, y] = WOOD_CORE
-            continue
-
-        # 2. 皮革缠绳区 (x=8)
-        if x == 8 and 14 <= s <= 17:
-            if s == 14 or s == 17:
-                pixels[x, y] = LEATHER_EDGE
-            else:
-                pixels[x, y] = LEATHER_CORE
-            continue
-
-        # 3. 铁质凿头 (x=9 到 x=13)
-        if 9 <= x <= 13 and 14 <= s <= 17:
-            if s == 14 or s == 17:
-                pixels[x, y] = IRON_EDGE
-            else:
-                pixels[x, y] = IRON_HIGHLIGHT if x == 13 else IRON_MID
-            continue
-
-        # 4. 凿尖 (x=14)
-        if x == 14:
-            if s == 15 or s == 16:
-                pixels[x, y] = IRON_HIGHLIGHT
-            elif s == 14:
-                pixels[x, y] = IRON_EDGE
-
-img.save('resonance_chisel.png')
-print("✅ 共鸣凿纹理已更新：铁头现在像真正的亮银色铁器了！")
+# ---------- 读取与处理 ----------
+img = Image.open(INPUT).convert("RGBA")
+data = img.getdata()
+new_data = [adjust_brightness(p) for p in data]
+new_img = Image.new("RGBA", img.size)
+new_img.putdata(new_data)
+new_img.save(OUTPUT)
+print(f"共鸣凿纹理优化完成，输出：{OUTPUT}")
